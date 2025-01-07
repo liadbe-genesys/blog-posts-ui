@@ -1,0 +1,17 @@
+/**
+ * This is main css page of the app, styling defined here will affect all the app.
+ --
+ * Note: you can modify app styling also via Joy UI theme (theme is defined at App.jsx).
+ * https://mui.com/joy-ui/customization/approaches/
+ */
+body {
+  font-family: "Inter";
+}
+
+/**
+ * For right-to-left support, un-comment the below section.
+ */
+
+/* html {
+  direction: rtl;
+} */
