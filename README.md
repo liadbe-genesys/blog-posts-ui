@@ -1,9 +1,9 @@
 # Blog Posts UI
 
-## Setting Up Frontend Dev Environment
+## Environment Setup
 1. Install node - v20.15.1 (LTS) - https://nodejs.org/en/download/prebuilt-installer 
 2. Install git - https://github.com/git-guides/install-git.
-3. Download VScode IDE - https://code.visualstudio.com/download (or any other IDE of your preference).
+3. Download VS Code IDE - https://code.visualstudio.com/download (or any other IDE of your preference).
 
 ## Project Installation
 1. Clone the repository - https://github.com/liadbe-genesys/blog-posts-ui.git.
