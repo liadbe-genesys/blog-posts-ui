@@ -4,7 +4,7 @@ import Stack from '@mui/joy/Stack';
 import Layout from '../components/Layout';
 import Header from '../components/Header';
 import Navigation from '../components/Navigation';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { navigationData } from '../data/navigationData';
 
 /**
@@ -39,7 +39,7 @@ export default function AppContainer() {
           borderColor: 'divider',
         }}
       >
-        {navigationData.map(nav =>
+        {navigationData.filter(nav => nav.displayName).map(nav =>
           <Button
             key={nav.path}
             variant="plain"

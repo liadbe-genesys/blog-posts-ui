@@ -1,85 +1,79 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Grid, Input, Stack, Typography } from "@mui/joy";
 import PostCard from "../components/PostCard";
 import ActionModal from "../components/ActionModal";
+import { useNotification } from "../hooks/useNotification";
+import useAxios from "../hooks/useAxios";
 
-/**
- * Fake data
- */
-const blogsData = [
-  {
-    id: "001",
-    title: "Thinking in React",
-    href: "https://react.dev/learn/thinking-in-react",
-    description: "Getting familiar with React concepts",
-    category: "dev",
-    image: "https://picsum.photos/200?random=1",
-    review: 3
-  }, {
-    id: "002",
-    title: "React App Starter",
-    href: "https://github.com/liadbe-genesys/react-app-starter",
-    description: "Hassle-free boilerplate to win the hackathon ",
-    category: "dev",
-    image: "https://picsum.photos/200?random=2",
-    review: 3
-  }, {
-    id: "003",
-    title: "Clone a Github Repository",
-    href: "https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository",
-    description: "Get the files to your laptop",
-    category: "dev",
-    image: "https://picsum.photos/200?random=3",
-    review: 3
-  }, {
-    id: "004",
-    title: "Bike Map Tel-Aviv",
-    href: "https://experience.arcgis.com/experience/0b4adbaac0b84c21af90f4ee4a397fe6",
-    description: "No more guessing bus ETAs",
-    category: "leisure",
-    image: "https://picsum.photos/200?random=4",
-    review: 3
-  }
-]
-
-// Init data for the state
-const defaultPost = {
-  id: '',
-  title: '',
-  href: '',
-  description: '',
-  category: '',
-  image: 'https://picsum.photos/200',
-  review: 3
-}
+export const getNotificationMessage = ({ endpoint, method, status }) => { 
+  return `API Endpoint: ${endpoint}\nMethod: ${method?.toUpperCase()}\nStatus: ${status}`
+} 
 
 /**
  * BlogPosts view is basically a view container for <PostCard /> components.
  */
 export default function BlogPosts() {
-  const [blogPosts, setBlogPosts] = useState(blogsData);
-  const [newPost, setNewPost] = useState(defaultPost);
-  
-  // Title we send to the modal
-  const title = "Add New Post";
+  const [blogPosts, setBlogPosts] = useState(null);
+  const [newPost, setNewPost] = useState({ title: '', href: '', description: '', category: '' });
+  const [changedData, setChangedData] = useState(false);
+  const { notifySuccess, notifyError } = useNotification();
 
-  // save function that we send to the modal
-  const onSave = () => {
-    const post = {...newPost};
-    const blogPostsArr = [...blogPosts];
-    post.id = Math.random();
-    blogPostsArr.push(post);
+  useEffect(() => {
+    const endpoint = 'http://localhost:3000/posts';
+    useAxios().get(endpoint)
+      .then(result => {
+        console.log(result)
+        setBlogPosts(result.data)
+        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
+      })
+      .catch(error => {
+        console.log(error)
+        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
+      });
+    setChangedData(false);
+  }, [changedData]);
 
-    // updating the states
-    setBlogPosts(blogPostsArr)
-    setNewPost(defaultPost);
+  const handleInputChange = (e) => {
+      const {name, value} = e.target;
+      setNewPost({ ...newPost, [name]: value });
+  };
+
+  const handleSaveNewPost = () => {
+    const endpoint = 'http://localhost:3000/posts'
+    useAxios().post(endpoint, newPost)
+      .then(result => {
+        console.log(result)
+        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
+        setTimeout(() => setChangedData(true), 5000);
+      })
+      .catch(error => {
+        console.log(error);
+        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
+      });    
   }
+
+  const handleDelete = (id) => {
+    const endpoint = `http://localhost:3000/posts/${id}`;
+    useAxios().delete(endpoint)
+      .then(result => {
+        console.log(result);
+        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
+        setTimeout(() => setChangedData(true), 5000);
+      })
+      .catch(error => {
+        console.log(error);
+        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
+      });
+  }
+
+  if (blogPosts === null) { return (<div>Loading...</div>) }
 
   return (
     <>
       <Typography level="h1" sx={{ marginBottom: '1rem' }}>
         Blog Posts
       </Typography>
+
       <Grid direction="row" justifyContent="space-between" container>
         <Grid sm={12} md={8}>
           <Stack 
@@ -90,26 +84,47 @@ export default function BlogPosts() {
               <PostCard 
                 key={blog.id} 
                 blog={blog}
-                removePost={(id) => {
-                  let clonedBlogPosts = blogPosts.slice();
-                  const blogIdToRemove = blogPosts.findIndex(blog => id === blog.id);
-                  if (blogIdToRemove > -1) {
-                    clonedBlogPosts.splice(blogIdToRemove, 1);
-                    setBlogPosts(clonedBlogPosts);
-                  }
-                }} 
+                onDelete={handleDelete} 
               />
             )}
           </Stack>
         </Grid>
+        
         <Grid>
-          {/** Using the modal */}
-          <ActionModal title={title} onSave={onSave}>
-            <div style={{display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px'}}>
-              <Input placeholder="Title" variant="outlined" onChange={(e) => setNewPost({...newPost, title: e.target.value})} />
-              <Input placeholder="Href" variant="outlined" onChange={(e) => setNewPost({...newPost, href: e.target.value})}/>
-              <Input placeholder="Description" variant="outlined" onChange={(e) => setNewPost({...newPost, description: e.target.value})}/>
-              <Input placeholder="Category" variant="outlined" onChange={(e) => setNewPost({...newPost, category: e.target.value})}/>
+          <ActionModal title="New Post" onSave={handleSaveNewPost}>
+            <div style={{display: 'flex', flexDirection: 'column', marginTop: '1rem'}}>
+              <Typography level="label">Title</Typography>
+              <Input 
+                name="title"
+                onChange={handleInputChange} 
+                size="sm" 
+                placeholder="e.g.: My Post" 
+              />
+              
+              <Typography level="label">Additional Link</Typography>
+              <Input 
+                name="href"
+                onChange={handleInputChange} 
+                size="sm" 
+                placeholder="e.g.: https://google.com"
+              />
+              
+              <Typography level="label">Description</Typography>
+              <Input 
+                name="description"
+                onChange={handleInputChange} 
+                size="sm" 
+                placeholder="description"
+              />
+              
+              <Typography level="label">Category</Typography>
+              <Input 
+                name="category"
+                onChange={handleInputChange} 
+                size="sm" 
+                placeholder="work, dev, fun, etc..."
+              />
+
             </div>
           </ActionModal>
         </Grid>

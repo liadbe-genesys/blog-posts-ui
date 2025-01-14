@@ -9,20 +9,25 @@ import Chip from '@mui/joy/Chip';
 import { Divider, Link } from '@mui/joy';
 import Stack from '@mui/joy/Stack';
 import Typography from '@mui/joy/Typography';
-import Star from '@mui/icons-material/Star';
 import IconButton from '@mui/joy/IconButton';
-
+import { Star, Edit, Delete, StarBorder } from '@mui/icons-material';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
-import Delete from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router';
 
 PostCard.propTypes = {
   blog: PropTypes.object
 };
 
 export default function PostCard(props) {
-  const { blog: { id, title, href, description, category, image, review }, removePost } = props;
+  const { blog: { id, title, href, description, category, imageUrl, favorite, review }, onDelete } = props;
   const [isLiked, setIsLiked] = React.useState(false);
+  let navigate = useNavigate();
 
+  const editPost = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/blog-post-form/${id}`)
+  }
   return (
     <Card
       variant="outlined"
@@ -54,7 +59,7 @@ export default function PostCard(props) {
             '--AspectRatio-maxHeight': { xs: '160px', sm: '9999px' },
           }}
         >
-          <img src={`${image}`} />
+          <img src={`${imageUrl}`} />
           <Stack
             alignItems="center"
             direction="row"
@@ -62,9 +67,7 @@ export default function PostCard(props) {
           >
             <IconButton
               variant="plain"
-              size="sm"
-              color={isLiked ? 'danger' : 'neutral'}
-              onClick={() => setIsLiked((prev) => !prev)}
+              color={favorite ? 'danger' : 'neutral'}
               sx={{
                 display: { xs: 'flex', sm: 'none' },
                 ml: 'auto',
@@ -107,7 +110,6 @@ export default function PostCard(props) {
           <Stack direction="row">
             <IconButton
               variant="plain"
-              size="sm"
               color={isLiked ? 'danger' : 'neutral'}
               onClick={() => setIsLiked((prev) => !prev)}
               sx={{
@@ -118,13 +120,24 @@ export default function PostCard(props) {
               <FavoriteRoundedIcon />
             </IconButton>
 
+            <IconButton
+              variant="plain"
+              onClick={editPost}
+              sx={{
+                display: { xs: 'none', sm: 'flex' },
+                borderRadius: '50%',
+              }}
+            >
+              <Edit />
+            </IconButton>
+
             <Divider orientation='vertical' />
 
             <IconButton
               variant="plain"
               size="sm"
               color={isLiked ? 'danger' : 'neutral'}
-              onClick={() => removePost(id)}
+              onClick={() => onDelete(id)}
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 borderRadius: '50%',
@@ -135,22 +148,8 @@ export default function PostCard(props) {
           </Stack>
         </Stack>
 
-        <Stack direction="row" sx={{ mt: 'auto' }}>
-          <Typography
-            level="title-sm"
-            startDecorator={
-              <React.Fragment>
-                <Star sx={{ color: 'warning.400' }} />
-                <Star sx={{ color: 'warning.400' }} />
-                <Star sx={{ color: 'warning.400' }} />
-                <Star sx={{ color: 'warning.400' }} />
-                <Star sx={{ color: 'warning.200' }} />
-              </React.Fragment>
-            }
-            sx={{ display: 'flex', gap: 1 }}
-          >
-            4.0
-          </Typography>
+        <Stack direction="row" sx={{ mt: 'auto' }} gap="0.25rem" alignItems="center">
+            {Array(1,2,3,4,5).map((item, i) => <span key={i}>{i < review ? <Star /> : <StarBorder />}</span>)}
         </Stack>
       </CardContent>
     </Card>

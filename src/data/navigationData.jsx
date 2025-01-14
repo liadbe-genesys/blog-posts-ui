@@ -2,6 +2,7 @@ import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import PagesOutlined from '@mui/icons-material/PagesOutlined';
 import Dashboard from "../views/Dashboard";
 import BlogPosts from "../views/BlogPosts";
+import BlogPostForm from '../views/BlogPostForm';
 
 export const navigationData = [
   { 
@@ -10,22 +11,14 @@ export const navigationData = [
     element: <Dashboard />, 
     icon: <DashboardOutlined />
   },
-  // { 
-  //   displayName: 'Data Table', 
-  //   path: 'data-table', 
-  //   element: <DataTable />,
-  //   icon: <TableChartOutlined />
-  // },
   { 
     displayName: 'Blog Posts', 
-    path: 'blog-posts', 
+    path: '/blog-posts', 
     element: <BlogPosts />, 
     icon: <PagesOutlined />
   },
-  // { 
-  //   displayName: 'Empty Page', 
-  //   path: 'empty-page', 
-  //   element: <FeaturePage />, 
-  //   icon: <CloudQueueOutlined />
-  // },
+  {
+    path: '/blog-post-form/:id', 
+    element: <BlogPostForm />, 
+  }
 ];

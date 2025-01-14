@@ -14,10 +14,8 @@ import Sheet from '@mui/joy/Sheet';
 export default function ActionModal({title, onSave, children}) {
   const [open, setOpen] = useState(false);
 
-  const onClickSave = () => {
-    // calling the onSave function we pass in the params
+  const handleSaveModal = () => {
     onSave();
-    // updating the state
     setOpen(false);
   }
 
@@ -25,7 +23,7 @@ export default function ActionModal({title, onSave, children}) {
     <React.Fragment>
       {/** The button that open the modal. you can change the text of the button below */}
       <Button onClick={() => setOpen(true)}>
-        Add New Post
+        Add Post
       </Button>
 
       <Modal
@@ -67,7 +65,7 @@ export default function ActionModal({title, onSave, children}) {
           {onSave &&
             <div style={{display: 'flex', justifyContent: 'flex-end', gap: '15px', marginTop: '20px'}}>
               <Button variant="outlined" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={onClickSave}>SAVE</Button>
+              <Button onClick={handleSaveModal}>Save</Button>
             </div>
           }
         </Sheet>

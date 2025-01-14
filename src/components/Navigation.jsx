@@ -30,7 +30,7 @@ export default function Navigation() {
             '& .JoyListItemButton-root': { p: '8px' },
           }}
         >
-          {navigationData.map(nav => 
+          {navigationData.filter(nav => nav.displayName).map(nav => 
             <ListItem key={nav.path}>
               <ListItemButton component="a" href={nav.path}>
                 <ListItemDecorator>

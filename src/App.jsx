@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
 import { experimental_extendTheme,  Experimental_CssVarsProvider, THEME_ID } from '@mui/material/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -6,6 +6,7 @@ import ErrorPage from './views/ErrorPage';
 import AppContainer from './views/AppContainer';
 import { navigationData } from './data/navigationData';
 import '@fontsource/inter';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 /**
  * Here you can extend or modify app theme (change colors, other styling preferences).
@@ -29,6 +30,15 @@ const theme = extendTheme({
     display: 'Inter, var(--joy-fontFamily-fallback)',
     body: 'Inter, var(--joy-fontFamily-fallback)',
   },
+  typography: {
+    label: {
+      fontSize: 'var(--joy-fontSize-xs)',
+      fontWeight: 'var(--joy-fontWeight-lg)',
+      lineHeight: 'var(--joy-lineHeight-sm)',
+      marginTop: '1rem',
+      marginBottom: '0.25rem'
+    },
+  }
 });
 
 /**
@@ -61,8 +71,10 @@ export default function App() {
   return (
     <Experimental_CssVarsProvider theme={{ [THEME_ID]: materialTheme }}>
       <CssVarsProvider disableTransitionOnChange theme={theme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
+        <NotificationProvider>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </NotificationProvider>
       </CssVarsProvider>
     </Experimental_CssVarsProvider>
   );
