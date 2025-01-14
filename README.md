@@ -8,11 +8,11 @@
 ## Project installation
 1. Clone the repository - https://github.com/liadbe-genesys/blog-posts-ui.git
 2. In your IDE:
-  - Open the project folder
-  - Navigate to Terminal menu, and open new terminal
+  1. Open the project folder
+  2. Navigate to Terminal menu, and open new terminal
 3. In the terminal:
-  Run `npm install`
-  Run `npm run dev` and open the browser on http://localhost:5173/
+  1. Run `npm install`
+  2. Run `npm run dev` and open the browser on http://localhost:5173/
 
 ## Additional Resources
 ### React
