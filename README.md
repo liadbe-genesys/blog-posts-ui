@@ -11,8 +11,8 @@
   - Open the project folder
   - Navigate to Terminal menu, and open new terminal
 3. In the terminal:
-  - Run `npm install`
-  - Run `npm run dev` and open the browser on http://localhost:5173/
+  Run `npm install`
+  Run `npm run dev` and open the browser on http://localhost:5173/
 
 ## Additional Resources
 ### React
