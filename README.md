@@ -1,12 +1,12 @@
 # Blog Posts UI
 
 ## Environment Setup
-1. Install node - v20.15.1 (LTS) - https://nodejs.org/en/download/prebuilt-installer 
+1. Install node - v20.15.1 (LTS) - https://nodejs.org/en/download/prebuilt-installer.
 2. Install git - https://github.com/git-guides/install-git.
 3. Download VS Code IDE - https://code.visualstudio.com/download (or any other IDE of your preference).
 
 ## Project Installation
-1. Clone the repository - https://github.com/liadbe-genesys/blog-posts-ui.git.
+1. Clone the repository - `git clone https://github.com/liadbe-genesys/blog-posts-ui.git`.
 2. In your IDE:
     1. Open the project folder.
     2. Navigate to Terminal menu, and open new terminal.
