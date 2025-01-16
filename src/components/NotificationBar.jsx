@@ -15,7 +15,7 @@ export default function NotificationBar({ show, type, message }) {
         onClose={() => setOpen(false)}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         color={type === 'success' ? 'success' : 'danger'}
-        autoHideDuration={5000}
+        autoHideDuration={2000}
         variant='solid'
       >
         <Stack direction="column" gap={'0.5rem'}>

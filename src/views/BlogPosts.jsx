@@ -44,7 +44,7 @@ export default function BlogPosts() {
       .then(result => {
         console.log(result)
         notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-        setTimeout(() => setChangedData(true), 5000);
+        setTimeout(() => setChangedData(true), 2000);
       })
       .catch(error => {
         console.log(error);
@@ -58,12 +58,26 @@ export default function BlogPosts() {
       .then(result => {
         console.log(result);
         notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-        setTimeout(() => setChangedData(true), 5000);
+        setTimeout(() => setChangedData(true), 2000);
       })
       .catch(error => {
         console.log(error);
         notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
       });
+  }
+
+  const handleToggleFavorite = (id, favoriteNewValue) => {
+    const endpoint = `http://localhost:3000/posts/${id}`;
+    useAxios().patch(endpoint, { favorite: favoriteNewValue })
+    .then(result => {
+      console.log(result)
+      notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
+      setTimeout(() => setChangedData(true), 2000);
+    })
+    .catch(error => {
+      console.log(error);
+      notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
+    }); 
   }
 
   if (blogPosts === null) { return (<div>Loading...</div>) }
@@ -84,7 +98,8 @@ export default function BlogPosts() {
               <PostCard 
                 key={blog.id} 
                 blog={blog}
-                onDelete={handleDelete} 
+                onDelete={handleDelete}
+                toggleFavorite={handleToggleFavorite}
               />
             )}
           </Stack>

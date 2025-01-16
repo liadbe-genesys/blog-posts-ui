@@ -1,5 +1,5 @@
 
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import AspectRatio from '@mui/joy/AspectRatio';
 import Card from '@mui/joy/Card';
@@ -19,8 +19,8 @@ PostCard.propTypes = {
 };
 
 export default function PostCard(props) {
-  const { blog: { id, title, href, description, category, imageUrl, favorite, review }, onDelete } = props;
-  const [isLiked, setIsLiked] = React.useState(false);
+  const { blog: { id, title, href, description, category, imageUrl, favorite, review }, onDelete, toggleFavorite } = props;
+  const [isLiked, setIsLiked] = useState(review);
   let navigate = useNavigate();
 
   const editPost = (e) => {
@@ -28,6 +28,7 @@ export default function PostCard(props) {
     e.stopPropagation();
     navigate(`/blog-post-form/${id}`)
   }
+
   return (
     <Card
       variant="outlined"
@@ -110,8 +111,8 @@ export default function PostCard(props) {
           <Stack direction="row">
             <IconButton
               variant="plain"
-              color={isLiked ? 'danger' : 'neutral'}
-              onClick={() => setIsLiked((prev) => !prev)}
+              color={favorite ? 'danger' : 'neutral'}
+              onClick={() => toggleFavorite(id, !favorite)}
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 borderRadius: '50%',
@@ -136,7 +137,6 @@ export default function PostCard(props) {
             <IconButton
               variant="plain"
               size="sm"
-              color={isLiked ? 'danger' : 'neutral'}
               onClick={() => onDelete(id)}
               sx={{
                 display: { xs: 'none', sm: 'flex' },
