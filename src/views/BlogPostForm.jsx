@@ -21,7 +21,7 @@ export default function BlogPostForm() {
       })
       .catch(error => {
         console.log(error);
-        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
+        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
       });
     setChangedData(false);
   }, [changedData]);
@@ -42,7 +42,7 @@ export default function BlogPostForm() {
     })
     .catch(error => {
       console.log(error);
-      notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.message}` }) })
+      notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
     }); 
   }
 
