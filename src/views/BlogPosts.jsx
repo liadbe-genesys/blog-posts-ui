@@ -6,7 +6,7 @@ import { useNotification } from "../hooks/useNotification";
 import useAxios from "../hooks/useAxios";
 
 export const getNotificationMessage = ({ endpoint, response }) => { 
-  return (`API Endpoint: ${endpoint}\nMethod: ${response?.config?.method?.toUpperCase()}\nStatus: ${response.status}—${response.statusText}${response.status >= 400 ? `\n${response.data.error}` : '' }`);
+  return (`API Endpoint: ${endpoint}\nMethod: ${response?.config?.method?.toUpperCase()}\nStatus: ${response.status}—${response.statusText}${response.status >= 400 ? `\n${response?.data?.message || ''} (${response?.data?.missingFields || ''})` : '' }`);
 } 
 
 export const FETCH_BLOG_POSTS_TIMEOUT = 2250;
@@ -19,21 +19,13 @@ export default function BlogPosts() {
   const [newPost, setNewPost] = useState({ title: '', href: '', description: '', category: '' });
   const { notifySuccess, notifyError } = useNotification();
 
-  const fetchBlogPosts = (wait) => {
+  const fetchBlogPosts = () => {
     const endpoint = 'http://localhost:3000/posts';
     useAxios().get(endpoint)
       .then(response => {
         console.log(response)
         setBlogPosts(response.data)
-
-        if (wait) { 
-          setTimeout(() => 
-            notifySuccess({ message: getNotificationMessage({ endpoint, response }) }), 
-            FETCH_BLOG_POSTS_TIMEOUT
-          );
-        } else {
-            notifySuccess({ message: getNotificationMessage({ endpoint, response }) });
-        }
+        notifySuccess({ message: getNotificationMessage({ endpoint, response }) });
       })
       .catch(error => {
         console.log(error)
@@ -41,7 +33,7 @@ export default function BlogPosts() {
       });
   }
 
-  useEffect(() => fetchBlogPosts(false), []);
+  useEffect(() => fetchBlogPosts(), []);
 
   const handleInputChange = (e) => {
       const {name, value} = e.target;
@@ -54,7 +46,7 @@ export default function BlogPosts() {
       .then(response => {
         console.log(response)
         notifySuccess({ message: getNotificationMessage({endpoint, response }) });
-        fetchBlogPosts(true);
+        setBlogPosts([...blogPosts, response.data]);
       })
       .catch(error => {
         console.log(error);
@@ -68,7 +60,7 @@ export default function BlogPosts() {
       .then(response => {
         console.log(response);
         notifySuccess({ message: getNotificationMessage({endpoint, response }) });
-        fetchBlogPosts(true);
+        setBlogPosts(blogPosts.filter(post => post.id !== id));
       })
       .catch(error => {
         console.log(error);
@@ -82,7 +74,7 @@ export default function BlogPosts() {
     .then(response => {
       console.log(response)
       notifySuccess({ message: getNotificationMessage({endpoint, response }) });
-      fetchBlogPosts(true);
+      setBlogPosts(blogPosts.map(post => post.id === id ? response.data : post));
     })
     .catch(error => {
       console.log(error);
@@ -104,9 +96,9 @@ export default function BlogPosts() {
             direction="column" 
             spacing="1rem"
           >
-            {blogPosts.map(blog => 
+            {blogPosts.map((blog, i) => 
               <PostCard 
-                key={blog.id} 
+                key={`${blog.id}${i}`} 
                 blog={blog}
                 onDelete={handleDelete}
                 toggleFavorite={handleToggleFavorite}

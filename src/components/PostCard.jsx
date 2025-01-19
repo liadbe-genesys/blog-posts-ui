@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import AspectRatio from '@mui/joy/AspectRatio';
 import Card from '@mui/joy/Card';
@@ -10,7 +9,7 @@ import { Divider, Link } from '@mui/joy';
 import Stack from '@mui/joy/Stack';
 import Typography from '@mui/joy/Typography';
 import IconButton from '@mui/joy/IconButton';
-import { Star, Edit, Delete, StarBorder } from '@mui/icons-material';
+import { Star, Edit, Delete, StarBorder, FavoriteBorderRounded } from '@mui/icons-material';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useNavigate } from 'react-router';
 
@@ -20,7 +19,6 @@ PostCard.propTypes = {
 
 export default function PostCard(props) {
   const { blog: { id, title, href, description, category, imageUrl, favorite, review }, onDelete, toggleFavorite } = props;
-  const [isLiked, setIsLiked] = useState(review);
   let navigate = useNavigate();
 
   const editPost = (e) => {
@@ -96,7 +94,8 @@ export default function PostCard(props) {
               <Link
                 underline="none"
                 href={href}
-                sx={{ color: 'text.primary' }}
+                sx={{ textDecoration: 'none' }}
+                rel='noopener noreferrer'
                 target="_blank"
               >
                 {title}
@@ -111,19 +110,23 @@ export default function PostCard(props) {
           <Stack direction="row">
             <IconButton
               variant="plain"
-              color={favorite ? 'danger' : 'neutral'}
+              color={favorite ? 'primary' : 'neutral'}
               onClick={() => toggleFavorite(id, !favorite)}
+              size='lg'
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 borderRadius: '50%',
               }}
             >
-              <FavoriteRoundedIcon />
+              { favorite ? <FavoriteRoundedIcon /> : <FavoriteBorderRounded /> }
             </IconButton>
+            
+            <Divider orientation='vertical' />
 
             <IconButton
               variant="plain"
               onClick={editPost}
+              size='lg'
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 borderRadius: '50%',
@@ -136,7 +139,7 @@ export default function PostCard(props) {
 
             <IconButton
               variant="plain"
-              size="sm"
+              size='lg'
               onClick={() => onDelete(id)}
               sx={{
                 display: { xs: 'none', sm: 'flex' },

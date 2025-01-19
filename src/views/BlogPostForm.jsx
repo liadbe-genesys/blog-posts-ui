@@ -1,30 +1,24 @@
-import { useParams } from 'react-router';
-import { Button, Grid, Input, Stack, Typography } from "@mui/joy";
+import { useNavigate, useParams } from 'react-router';
+import { Button, Grid, IconButton, Input, Stack, Typography } from "@mui/joy";
 import { useEffect, useState } from 'react';
 import useAxios from '../hooks/useAxios';
 import { useNotification } from '../hooks/useNotification';
-import { FETCH_BLOG_POSTS_TIMEOUT, getNotificationMessage } from './BlogPosts';
+import { getNotificationMessage } from './BlogPosts';
+import { ArrowBackIosNew } from '@mui/icons-material';
 
 export default function BlogPostForm() {
   const { id } = useParams();
   const [blogPostData, setBlogPostData] = useState(null);
   const { notifySuccess, notifyError } = useNotification();
-
-  const fetchBlogPost = (wait) => {
+  let navigate = useNavigate(); 
+  
+  const fetchBlogPost = () => {
     const endpoint = `http://localhost:3000/posts/${id}`;
     useAxios().get(endpoint)
       .then(response => {
         console.log(response)
         setBlogPostData(response.data)
-
-        if (wait) { 
-          setTimeout(() => 
-            notifySuccess({ message: getNotificationMessage({ endpoint, response }) }), 
-            FETCH_BLOG_POSTS_TIMEOUT
-          );
-        } else {
-            notifySuccess({ message: getNotificationMessage({ endpoint, response }) });
-        }
+        notifySuccess({ message: getNotificationMessage({ endpoint, response }) });
       })
       .catch(error => {
         console.log(error)
@@ -46,7 +40,6 @@ export default function BlogPostForm() {
     .then(response => {
       console.log(response)
       notifySuccess({ message: getNotificationMessage({endpoint, response }) });
-      fetchBlogPost(true);
     })
     .catch(error => {
       console.log(error);
@@ -58,9 +51,14 @@ export default function BlogPostForm() {
 
   return (
     <>
-      <Typography level="h1" sx={{ marginBottom: '1rem' }}>
-        {blogPostData.title}
-      </Typography>
+      <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+        <IconButton variant='outlined' size='lg' onClick={() => navigate('/blog-posts')} sx={{ marginRight: '1rem' }}>
+          <ArrowBackIosNew />
+        </IconButton>
+        <Typography level="h1" sx={{ marginBottom: '1rem', display: 'inline' }}>
+          {blogPostData.title}
+        </Typography>
+      </Stack>
 
       <Grid direction="row" justifyContent="space-between" container>
         <Grid sm={12} md={8}>
