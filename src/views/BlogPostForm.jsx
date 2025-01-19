@@ -27,7 +27,7 @@ export default function BlogPostForm() {
   }, [changedData]);
 
   const handleInputChange = (e) => {
-      const {name, value} = e.target;  // Destructure directly from e.target
+      const {name, value} = e.target;
       console.log(name, value)
       setBlogPostData({ ...blogPostData, [name]: value });
   };
@@ -38,7 +38,7 @@ export default function BlogPostForm() {
     .then(result => {
       console.log(result)
       notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-      setTimeout(() => setChangedData(true), 5000);
+      setTimeout(() => setChangedData(true), 2000);
     })
     .catch(error => {
       console.log(error);
