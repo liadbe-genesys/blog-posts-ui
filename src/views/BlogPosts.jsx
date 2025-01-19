@@ -5,9 +5,11 @@ import ActionModal from "../components/ActionModal";
 import { useNotification } from "../hooks/useNotification";
 import useAxios from "../hooks/useAxios";
 
-export const getNotificationMessage = ({ endpoint, method, status }) => { 
-  return `API Endpoint: ${endpoint}\nMethod: ${method?.toUpperCase()}\nStatus: ${status}`
+export const getNotificationMessage = ({ endpoint, response }) => { 
+  return (`API Endpoint: ${endpoint}\nMethod: ${response?.config?.method?.toUpperCase()}\nStatus: ${response.status}—${response.statusText}${response.status >= 400 ? `\n${response.data.error}` : '' }`);
 } 
+
+export const FETCH_BLOG_POSTS_TIMEOUT = 2250;
 
 /**
  * BlogPosts view is basically a view container for <PostCard /> components.
@@ -15,23 +17,31 @@ export const getNotificationMessage = ({ endpoint, method, status }) => {
 export default function BlogPosts() {
   const [blogPosts, setBlogPosts] = useState(null);
   const [newPost, setNewPost] = useState({ title: '', href: '', description: '', category: '' });
-  const [changedData, setChangedData] = useState(false);
   const { notifySuccess, notifyError } = useNotification();
 
-  useEffect(() => {
+  const fetchBlogPosts = (wait) => {
     const endpoint = 'http://localhost:3000/posts';
     useAxios().get(endpoint)
-      .then(result => {
-        console.log(result)
-        setBlogPosts(result.data)
-        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
+      .then(response => {
+        console.log(response)
+        setBlogPosts(response.data)
+
+        if (wait) { 
+          setTimeout(() => 
+            notifySuccess({ message: getNotificationMessage({ endpoint, response }) }), 
+            FETCH_BLOG_POSTS_TIMEOUT
+          );
+        } else {
+            notifySuccess({ message: getNotificationMessage({ endpoint, response }) });
+        }
       })
       .catch(error => {
         console.log(error)
-        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
+        notifyError({ message: getNotificationMessage({ endpoint, response: error.response }) });
       });
-    setChangedData(false);
-  }, [changedData]);
+  }
+
+  useEffect(() => fetchBlogPosts(false), []);
 
   const handleInputChange = (e) => {
       const {name, value} = e.target;
@@ -41,43 +51,43 @@ export default function BlogPosts() {
   const handleSaveNewPost = () => {
     const endpoint = 'http://localhost:3000/posts'
     useAxios().post(endpoint, newPost)
-      .then(result => {
-        console.log(result)
-        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-        setTimeout(() => setChangedData(true), 2000);
+      .then(response => {
+        console.log(response)
+        notifySuccess({ message: getNotificationMessage({endpoint, response }) });
+        fetchBlogPosts(true);
       })
       .catch(error => {
         console.log(error);
-        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
-      });    
+        notifyError({ message: getNotificationMessage({ endpoint, response: error.response }) });
+      })
   }
 
   const handleDelete = (id) => {
     const endpoint = `http://localhost:3000/posts/${id}`;
     useAxios().delete(endpoint)
-      .then(result => {
-        console.log(result);
-        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-        setTimeout(() => setChangedData(true), 2000);
+      .then(response => {
+        console.log(response);
+        notifySuccess({ message: getNotificationMessage({endpoint, response }) });
+        fetchBlogPosts(true);
       })
       .catch(error => {
         console.log(error);
-        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
-      });
+        notifyError({ message: getNotificationMessage({ endpoint, response: error.response }) });
+      })
   }
 
   const handleToggleFavorite = (id, favoriteNewValue) => {
     const endpoint = `http://localhost:3000/posts/${id}`;
     useAxios().patch(endpoint, { favorite: favoriteNewValue })
-    .then(result => {
-      console.log(result)
-      notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-      setTimeout(() => setChangedData(true), 2000);
+    .then(response => {
+      console.log(response)
+      notifySuccess({ message: getNotificationMessage({endpoint, response }) });
+      fetchBlogPosts(true);
     })
     .catch(error => {
       console.log(error);
-      notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: error.status }) })
-    }); 
+        notifyError({ message: getNotificationMessage({ endpoint, response: error.response }) });
+    })
   }
 
   if (blogPosts === null) { return (<div>Loading...</div>) }

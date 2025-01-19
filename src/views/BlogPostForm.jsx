@@ -3,28 +3,36 @@ import { Button, Grid, Input, Stack, Typography } from "@mui/joy";
 import { useEffect, useState } from 'react';
 import useAxios from '../hooks/useAxios';
 import { useNotification } from '../hooks/useNotification';
-import { getNotificationMessage } from './BlogPosts';
+import { FETCH_BLOG_POSTS_TIMEOUT, getNotificationMessage } from './BlogPosts';
 
 export default function BlogPostForm() {
   const { id } = useParams();
   const [blogPostData, setBlogPostData] = useState(null);
-  const [changedData, setChangedData] = useState(false);
   const { notifySuccess, notifyError } = useNotification();
 
-  useEffect(() => {
+  const fetchBlogPost = (wait) => {
     const endpoint = `http://localhost:3000/posts/${id}`;
     useAxios().get(endpoint)
-      .then(result => {
-        console.log(result)
-        setBlogPostData(result.data)
-        notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
+      .then(response => {
+        console.log(response)
+        setBlogPostData(response.data)
+
+        if (wait) { 
+          setTimeout(() => 
+            notifySuccess({ message: getNotificationMessage({ endpoint, response }) }), 
+            FETCH_BLOG_POSTS_TIMEOUT
+          );
+        } else {
+            notifySuccess({ message: getNotificationMessage({ endpoint, response }) });
+        }
       })
       .catch(error => {
-        console.log(error);
-        notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
+        console.log(error)
+        notifyError({ message: getNotificationMessage({ endpoint, response: error.response }) });
       });
-    setChangedData(false);
-  }, [changedData]);
+  }
+
+  useEffect(() => fetchBlogPost(false), []);
 
   const handleInputChange = (e) => {
       const {name, value} = e.target;
@@ -35,15 +43,15 @@ export default function BlogPostForm() {
   const handleSave = () => {
     const endpoint = `http://localhost:3000/posts/${id}`;
     useAxios().put(endpoint, blogPostData)
-    .then(result => {
-      console.log(result)
-      notifySuccess({ message: getNotificationMessage({endpoint, method: result.config.method, status: result.status}) })
-      setTimeout(() => setChangedData(true), 2000);
+    .then(response => {
+      console.log(response)
+      notifySuccess({ message: getNotificationMessage({endpoint, response }) });
+      fetchBlogPost(true);
     })
     .catch(error => {
       console.log(error);
-      notifyError({ message: getNotificationMessage({endpoint, method: error.config.method, status: `${error.status ? error.status + '; ' : ''}${error.response.data.message}` }) })
-    }); 
+      notifyError({ message: getNotificationMessage({ endpoint, response: error.response }) });
+    })
   }
 
   if (blogPostData === null) { return (<div>Loading...</div>) }
